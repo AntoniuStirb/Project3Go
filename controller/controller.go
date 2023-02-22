@@ -4,7 +4,6 @@ import (
 	"Project3Go/models"
 	"Project3Go/service"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -35,7 +34,7 @@ func HowMuchTillPayday(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := service.TillSalary(payDay)
+	result := service.TillSalary(payDay, time.Now().Month())
 	w.Header().Set("Content-Type", "application/json")
 	jsonResp, err := json.Marshal(result)
 	if err != nil {
@@ -67,25 +66,28 @@ func PayDayListDates(w http.ResponseWriter, r *http.Request) {
 	now := time.Now()
 	_, month, _ := now.Date()
 	currentMonth := int(month)
+	//fmt.Printf("current month: %v", currentMonth)
 	//if currentMonth == 12 && payDay>= currentDay{
 	//	return
 	//}
 
-	result := service.TillSalary(payDay)
-	//nextPayday:= result.NextDate
-	//fmt.Fprintf(w, "The value of 'result' is %s,%v", result.NextDate, result.DaysUntil)
+	result := service.TillSalary(payDay, month)
+
 	var response models.PayDayResponse
-	test := response.PayDays
-	for currentMonth <= 12 {
-		nextPayDay := result.NextDate
-		nextPayDayInt, err1 := strconv.Atoi(nextPayDay)
-		fmt.Println(nextPayDayInt)
-		if err1 != nil || payDay <= 0 || payDay > 31 {
-			http.Error(w, "Invalid pay dayaaaaaaa", http.StatusBadRequest)
-			return
-		}
-		result = service.TillSalary(payDay)
-		test = append(test, nextPayDay)
+	var lastMonth int
+
+	if payDay >= time.Now().Day() {
+		lastMonth = 12
+	} else {
+		lastMonth = 11
+	}
+
+	for currentMonth <= lastMonth {
+		newMonth2 := now.AddDate(0, currentMonth-1, 0)
+		response.PayDays = append(response.PayDays, result.NextDate)
+
+		result = service.TillSalary(payDay, newMonth2.Month())
+
 		currentMonth++
 	}
 
@@ -96,7 +98,7 @@ func PayDayListDates(w http.ResponseWriter, r *http.Request) {
 	//	currentMonth++
 	//}
 
-	jsonResponse, err := json.Marshal(test)
+	jsonResponse, err := json.Marshal(response)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
