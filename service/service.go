@@ -26,7 +26,7 @@ func TillSalary(payDay int) models.SalaryResponse {
 	} else {
 		if now.Day() <= payDay {
 			response.DaysUntil = payDay - now.Day()
-			response.NextDate = now.AddDate(0, 0, lastDayOfMonth).Format("02-01-2006")
+			response.NextDate = now.AddDate(0, 0, response.DaysUntil).Format("02-01-2006")
 			return response
 		} else if now.Day() > payDay {
 			response.DaysUntil = lastDayOfMonth - now.Day() + payDay

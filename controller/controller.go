@@ -7,58 +7,9 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
-
-func PayDayListDates(w http.ResponseWriter, r *http.Request) {
-	payDayStr := r.URL.Path[len("/till-sallary/pay-day/"):]
-	payDay, err := strconv.Atoi(payDayStr)
-	if err != nil || payDay <= 0 || payDay > 31 {
-		http.Error(w, "Invalid pay day", http.StatusBadRequest)
-		return
-	}
-
-	now := time.Now()
-	_, month, _ := now.Date()
-	currentMonth := int(month)
-	//if currentMonth == 12 && payDay>= currentDay{
-	//	return
-	//}
-
-	result := service.TillSalary(payDay)
-	//nextPayday:= result.NextDate
-
-	var response models.PayDayResponse
-	test := response.PayDays
-	for currentMonth <= 12 {
-		nextPayDay := result.NextDate
-		nextPayDayInt, err1 := strconv.Atoi(nextPayDay)
-		fmt.Println(nextPayDayInt)
-		if err1 != nil || payDay <= 0 || payDay > 31 {
-			http.Error(w, "Invalid pay day", http.StatusBadRequest)
-			return
-		}
-		result = service.TillSalary(payDay)
-		test = append(test, nextPayDay)
-		currentMonth++
-	}
-
-	//response := make([]time.Time, 0, 12-currentMonth+1)
-	//for currentMonth <= 12 {
-	//	nextPayday := time.Date(year, time.Month(currentMonth), payDay, 0, 0, 0, 0, now.Location())
-	//	response = append(response, nextPayday)
-	//	currentMonth++
-	//}
-
-	jsonResponse, err := json.Marshal(test)
-	if err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonResponse)
-}
 
 func HowMuchTillPayday(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
@@ -94,4 +45,63 @@ func HowMuchTillPayday(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonResp)
 
+}
+
+func PayDayListDates(w http.ResponseWriter, r *http.Request) {
+	path := r.URL.Path
+	components := strings.Split(path, "/")
+	if components[4] != "list-dates" || len(components) > 5 {
+		http.Error(w, "Invalid URL", http.StatusBadRequest)
+		return
+	}
+	day := components[3]
+
+	// Print the value to the response writer
+	//fmt.Fprintf(w, "The value of 'day' is %s", day)
+	payDay, err := strconv.Atoi(day)
+	if err != nil || payDay <= 0 || payDay > 31 {
+		http.Error(w, "Invalid pay day", http.StatusBadRequest)
+		return
+	}
+	//fmt.Fprintf(w, "The value of 'payday' is %s", payDay)
+	now := time.Now()
+	_, month, _ := now.Date()
+	currentMonth := int(month)
+	//if currentMonth == 12 && payDay>= currentDay{
+	//	return
+	//}
+
+	result := service.TillSalary(payDay)
+	//nextPayday:= result.NextDate
+	//fmt.Fprintf(w, "The value of 'result' is %s,%v", result.NextDate, result.DaysUntil)
+	var response models.PayDayResponse
+	test := response.PayDays
+	for currentMonth <= 12 {
+		nextPayDay := result.NextDate
+		nextPayDayInt, err1 := strconv.Atoi(nextPayDay)
+		fmt.Println(nextPayDayInt)
+		if err1 != nil || payDay <= 0 || payDay > 31 {
+			http.Error(w, "Invalid pay dayaaaaaaa", http.StatusBadRequest)
+			return
+		}
+		result = service.TillSalary(payDay)
+		test = append(test, nextPayDay)
+		currentMonth++
+	}
+
+	//response := make([]time.Time, 0, 12-currentMonth+1)
+	//for currentMonth <= 12 {
+	//	nextPayday := time.Date(year, time.Month(currentMonth), payDay, 0, 0, 0, 0, now.Location())
+	//	response = append(response, nextPayday)
+	//	currentMonth++
+	//}
+
+	jsonResponse, err := json.Marshal(test)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonResponse)
 }
