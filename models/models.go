@@ -1,10 +1,10 @@
 package models
 
-type SalaryResponse struct {
+type NextPayDayResponse struct {
 	DaysUntil int    `json:"days_until"`
 	NextDate  string `json:"next_date"`
 }
 
-type PayDayResponse struct {
+type PayDayListResponse struct {
 	PayDays []string `json:"pay_days"`
 }
