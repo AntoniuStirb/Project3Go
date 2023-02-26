@@ -68,9 +68,9 @@ func TestTillSalary(t *testing.T) {
 	}
 
 	for _, tests := range testCases {
-		actual := TillSalary(tests.payDay, tests.currentDay, tests.month)
+		actual := NextPayDay(tests.payDay, tests.currentDay, tests.month)
 		if diff := cmp.Diff(actual, tests.expected); diff != "" {
-			t.Errorf("TillSalary(%v, %v) = %v; expected %v", tests.payDay, tests.month, actual, tests.expected)
+			t.Errorf("NextPayDay(%v, %v) = %v; expected %v", tests.payDay, tests.month, actual, tests.expected)
 		}
 	}
 }

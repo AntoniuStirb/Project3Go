@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func TillSalary(payDay int, currentDay int, month time.Month) models.NextPayDayResponse {
+func NextPayDay(payDay int, currentDay int, month time.Month) models.NextPayDayResponse {
 	now := time.Date(time.Now().Year(), month, currentDay, 0, 0, 0, 0, time.Now().Location())
 	response := models.NextPayDayResponse{}
 	lastDayOfMonth := time.Date(time.Now().Year(), month+1, 0, 0, 0, 0, 0, time.UTC).Day()
@@ -47,7 +47,7 @@ func PayDayList(payDay int, currentDay int, month time.Month) models.PayDayListR
 	now := time.Now()
 	//_, month, currentDay := now.Date()
 	currentMonth := int(month)
-	result := TillSalary(payDay, currentDay, month)
+	result := NextPayDay(payDay, currentDay, month)
 	var response models.PayDayListResponse
 	var lastMonth int
 
@@ -58,18 +58,29 @@ func PayDayList(payDay int, currentDay int, month time.Month) models.PayDayListR
 	}
 
 	for currentMonth <= lastMonth {
-		newMonth2 := now.AddDate(0, currentMonth-1, 0)
+		newMonth := now.AddDate(0, currentMonth-1, 0)
 		response.PayDays = append(response.PayDays, result.NextDate)
 
-		result = TillSalary(payDay, currentDay, newMonth2.Month())
+		result = NextPayDay(payDay, currentDay, newMonth.Month())
 
 		currentMonth++
 	}
 	return response
 }
 
+//
 //func isWeekend(date time.Time) bool {
 //	return date.Weekday() == time.Saturday || date.Weekday() == time.Sunday
+//}
+
+//func fridayBefore(date time.Time) time.Time {
+//	if date.Weekday().String() == time.Saturday.String() {
+//		date.AddDate(0, 0, -1)
+//	} else {
+//		date.AddDate(0, 0, -2)
+//	}
+//	fmt.Printf("AAAAA: %v", date.Weekday().String())
+//	return date
 //}
 //
 //func previousFriday(date time.Time) time.Time {

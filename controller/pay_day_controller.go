@@ -27,7 +27,7 @@ func HowMuchTillPayday(w http.ResponseWriter, r *http.Request) {
 	// Calculate the number of days until the next payday.
 	currentMonth := time.Now().Month()
 	currentDay := time.Now().Day()
-	daysUntilPayday := service.TillSalary(payDay, currentDay, currentMonth)
+	daysUntilPayday := service.NextPayDay(payDay, currentDay, currentMonth)
 
 	// Write the response as JSON.
 	jsonResponse, err := json.Marshal(daysUntilPayday)

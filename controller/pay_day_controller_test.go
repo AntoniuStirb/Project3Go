@@ -80,21 +80,28 @@ func TestPayDayListDates(t *testing.T) {
 	}{
 		{
 			name:           "Invalid URL",
-			url:            "/payday/123/list-dates/asdasd",
+			url:            "/till-salary/payday/12/list-dates/asdasd",
+			expectedStatus: http.StatusBadRequest,
+			expectedBody:   "Invalid URL\n",
+		},
+		{
+			name:           "Invalid URL",
+			url:            "/till-salary/payday//list-dates/asdasd",
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   "Invalid URL\n",
 		},
 		{
 			name:           "Invalid Pay Day",
-			url:            "/payday/40/list-dates",
+			url:            "/till-salary/payday/40/list-dates",
 			expectedStatus: http.StatusBadRequest,
 			expectedBody:   "Invalid pay day\n",
 		},
 		{
 			name:           "Successful Request",
-			url:            "/payday/15/list-dates",
+			url:            "/till-salary/payday/15/list-dates",
 			expectedStatus: http.StatusOK,
-			expectedBody:   `{"pay_days":["15-03-2023","15-04-2023","15-05-2023","15-06-2023","15-07-2023","15-08-2023","15-09-2023","15-10-2023","15-11-2023","15-12-2023"]}`,
+			expectedBody: `{"pay_days":["15-03-2023","15-04-2023","15-05-2023","15-06-2023","15-07-2023","15-08-2023",
+							"15-09-2023","15-10-2023","15-11-2023","15-12-2023"]}`,
 		},
 	}
 	for _, testCase := range testCases {
@@ -109,7 +116,7 @@ func TestPayDayListDates(t *testing.T) {
 			handler.ServeHTTP(rec, req)
 
 			if rec.Code != testCase.expectedStatus {
-				t.Errorf("got status code %d, want %d", rec.Code, testCase.expectedStatus)
+				t.Errorf("unexpected status code: got %d, want %d", rec.Code, testCase.expectedStatus)
 			}
 
 			if rec.Body.String() != testCase.expectedBody {
