@@ -66,18 +66,13 @@ func TestHowMuchTillPayday(t *testing.T) {
 
 	for _, testCase := range tests {
 		t.Run(testCase.name, func(t *testing.T) {
-			// Create a new request with the test parameters.
 			req, err := http.NewRequest(testCase.method, fmt.Sprintf("/?pay_day=%s", testCase.payDay), nil)
 			if err != nil {
 				t.Errorf("failed to create request: %v", err)
 			}
 
-			// Set the query parameters for the request.
-			//q := req.URL.Query()
-			//q.Add("pay_day", tt.payDay)
 			rec := httptest.NewRecorder()
 
-			// Call the handler function with the test request and response.
 			handler := http.HandlerFunc(HowMuchTillPayday)
 			handler.ServeHTTP(rec, req)
 

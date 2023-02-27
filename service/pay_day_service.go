@@ -30,10 +30,10 @@ func NextPayDay(payDay int, currentDay int, month time.Month) models.NextPayDayR
 	return response
 }
 
-// PayDayList calculates a list of pay days for the remaining paydays of the year based on the user's pay day and the current day of the month.
+// PayDayList calculates a list of pay days for the remaining months of the year based on the user's pay day and the current day of the month.
 // It uses a loop to iterate over the remaining months of the year and appends the date of each pay day to a
-// response of type models.PayDayListResponse The function calls the NextPayDay function to calculate the number of days
-// until the next payday and the date for each month. Finally, the function returns the response struct containing the list of pay days.
+// response of type models.PayDayListResponse The function calls the NextPayDay function to calculate the date for each month.
+// Finally, the function returns the response struct containing the list of pay days.
 func PayDayList(payDay int, currentDay int, month time.Month) models.PayDayListResponse {
 	now := time.Now()
 	currentMonth := int(month)

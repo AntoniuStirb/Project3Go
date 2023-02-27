@@ -52,10 +52,10 @@ func HowMuchTillPayday(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// PayDayListDates This is a handler for a HTTP endpoint that expects a URL path with the format
-// "/payday/{day}/list-dates", where {day} is an integer representing the day of the month when the user gets paid.
+// PayDayListDates is a handler for a HTTP endpoint that expects a URL path with the format
+// "/payday/{day}/list-dates", where {day} is an integer representing the day of the month when the user gets the payday.
 // The function only accepts GET requests, and returns a JSON response with a list of upcoming paydays based on the current day
-// and month, and the user's pay day. If the URL path or pay day parameter are invalid,
+// current month, and the user's pay day. If the URL path or pay day parameter are invalid,
 // the function returns an appropriate HTTP error status code.
 func PayDayListDates(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
