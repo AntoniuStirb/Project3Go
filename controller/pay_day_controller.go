@@ -9,7 +9,15 @@ import (
 	"time"
 )
 
+// HowMuchTillPayday is an HTTP request handler which accepts only GET requests that calculates the number of days until the next
+// payday and the date based on the user's pay day and the current day of the month. It parses the pay_day query parameter from the URL,
+// validates it, and calls the NextPayDay function from the service package to calculate the number of days until the next payday.
+// Finally, it writes the response of type models.NextPayDayResponse as JSON to the HTTP response writer.
 func HowMuchTillPayday(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
 	// Parse the query parameters.
 	payDayStr := r.URL.Query().Get("pay_day")
 	if payDayStr == "" {
@@ -44,7 +52,16 @@ func HowMuchTillPayday(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// PayDayListDates This is a handler for a HTTP endpoint that expects a URL path with the format
+// "/payday/{day}/list-dates", where {day} is an integer representing the day of the month when the user gets paid.
+// The function only accepts GET requests, and returns a JSON response with a list of upcoming paydays based on the current day
+// and month, and the user's pay day. If the URL path or pay day parameter are invalid,
+// the function returns an appropriate HTTP error status code.
 func PayDayListDates(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
 	path := r.URL.Path
 	components := strings.Split(path, "/")
 	if components[4] != "list-dates" || len(components) != 5 {

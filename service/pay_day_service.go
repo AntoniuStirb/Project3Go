@@ -5,37 +5,24 @@ import (
 	"time"
 )
 
+// NextPayDay takes three inputs: the user's pay day, the current day of the month, and the month of interest.
+// It calculates the number of days until the next payday based on the current day and the pay day.
+// Then, it returns a models.NextPayDayResponse struct that contains the number of days until the next payday and the date of the next payday.
+// The function works by creating a time.Time object that represents the current date,
+// then using that object to calculate the number of days until the next payday.
+// Finally, it formats the date of the next payday as a string and returns the response.
+// If the payDay is bigger than last day of current month, the payDay will take place on the last day of month.
 func NextPayDay(payDay int, currentDay int, month time.Month) models.NextPayDayResponse {
 	now := time.Date(time.Now().Year(), month, currentDay, 0, 0, 0, 0, time.Now().Location())
 	response := models.NextPayDayResponse{}
-	lastDayOfMonth := time.Date(time.Now().Year(), month+1, 0, 0, 0, 0, 0, time.UTC).Day()
+	lastDayOfMonth := time.Date(time.Now().Year(), month+1, 0, 0, 0, 0, 0, time.Now().Location()).Day()
 
-	//if payDay <= lastDayOfMonth {
-	//	payDayTime := time.Date(time.Now().Year(), month, payDay, 0, 0, 0, 0, time.Now().Location())
-	//	if isWeekend(payDayTime) {
-	//		fmt.Printf("AAAA: %v\n", payDayTime)
-	//		payDayTime = previousFriday(payDayTime)
-	//	}
-	//	payDay = payDayTime.Day()
-	//} else {
-	//	payDayTime := time.Date(time.Now().Year(), month, lastDayOfMonth, 0, 0, 0, 0, time.Now().Location())
-	//	if isWeekend(payDayTime) {
-	//		fmt.Printf("BBBBB: %v\n", payDayTime)
-	//		payDayTime = previousFriday(payDayTime)
-	//	}
-	//	payDay = payDayTime.Day()
-	//}
-
-	if payDay > lastDayOfMonth { //daca data de salariu este mai mare decat ultima zi a lunii
-		if now.Day() <= payDay { //daca data de salariu nu a trecut inca in luna curenta
-			response.DaysUntil = lastDayOfMonth - currentDay
-		} else if now.Day() > payDay { //daca data de salariu a trecut luna aceasta
-			response.DaysUntil = lastDayOfMonth - currentDay + payDay
-		}
-	} else { //daca data de salariu nu este mai mare decat ultima zi a lunii
-		if now.Day() <= payDay { //daca data de salariu nu a trecut inca in luna curenta
+	if payDay > lastDayOfMonth { //if payday is bigger than last day of current month
+		response.DaysUntil = lastDayOfMonth - currentDay
+	} else { //if payday is smaller than last day of month
+		if now.Day() <= payDay { //if pay day did not pass this month
 			response.DaysUntil = payDay - currentDay
-		} else if now.Day() > payDay { //daca data de salariu a trecut luna aceasta
+		} else if now.Day() > payDay { //if pay day passed this month
 			response.DaysUntil = lastDayOfMonth - currentDay + payDay
 		}
 	}
@@ -43,51 +30,26 @@ func NextPayDay(payDay int, currentDay int, month time.Month) models.NextPayDayR
 	return response
 }
 
+// PayDayList calculates a list of pay days for the remaining paydays of the year based on the user's pay day and the current day of the month.
+// It uses a loop to iterate over the remaining months of the year and appends the date of each pay day to a
+// response of type models.PayDayListResponse The function calls the NextPayDay function to calculate the number of days
+// until the next payday and the date for each month. Finally, the function returns the response struct containing the list of pay days.
 func PayDayList(payDay int, currentDay int, month time.Month) models.PayDayListResponse {
 	now := time.Now()
-	//_, month, currentDay := now.Date()
 	currentMonth := int(month)
 	result := NextPayDay(payDay, currentDay, month)
 	var response models.PayDayListResponse
 	var lastMonth int
-
 	if payDay >= currentDay {
 		lastMonth = 12
 	} else {
 		lastMonth = 11
 	}
-
 	for currentMonth <= lastMonth {
 		newMonth := now.AddDate(0, currentMonth-1, 0)
 		response.PayDays = append(response.PayDays, result.NextDate)
-
 		result = NextPayDay(payDay, currentDay, newMonth.Month())
-
 		currentMonth++
 	}
 	return response
 }
-
-//
-//func isWeekend(date time.Time) bool {
-//	return date.Weekday() == time.Saturday || date.Weekday() == time.Sunday
-//}
-
-//func fridayBefore(date time.Time) time.Time {
-//	if date.Weekday().String() == time.Saturday.String() {
-//		date.AddDate(0, 0, -1)
-//	} else {
-//		date.AddDate(0, 0, -2)
-//	}
-//	fmt.Printf("AAAAA: %v", date.Weekday().String())
-//	return date
-//}
-//
-//func previousFriday(date time.Time) time.Time {
-//	daysSinceFriday := int(date.Weekday() - time.Friday)
-//	if daysSinceFriday < 0 {
-//		daysSinceFriday += 7
-//	}
-//	fridayDate := date.AddDate(0, 0, -daysSinceFriday)
-//	return fridayDate
-//}
