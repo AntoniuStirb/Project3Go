@@ -45,8 +45,11 @@ func PayDayList(payDay int, currentDay int, month time.Month) models.PayDayListR
 	} else {
 		lastMonth = 11
 	}
+
+	previousMonth := currentMonth - 1
+
 	for currentMonth <= lastMonth {
-		newMonth := now.AddDate(0, currentMonth-1, 0)
+		newMonth := now.AddDate(0, currentMonth-previousMonth, 0)
 		response.PayDays = append(response.PayDays, result.NextDate)
 		result = NextPayDay(payDay, currentDay, newMonth.Month())
 		currentMonth++
